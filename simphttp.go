@@ -27,7 +27,7 @@ func main() {
 
 	addr := fmt.Sprintf("localhost:%s", *port)
 	log.Printf("Current directory is %v\n", dir)
-	http.Handle("/", http.StripPrefix("/", http.FileServer(http.Dir(dir))))
+	http.Handle("/", http.FileServer(http.Dir(dir)))
 	log.Printf("Running on port %s\n", addr)
 
 	c := make(chan os.Signal, 1)
