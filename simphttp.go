@@ -4,6 +4,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -17,8 +18,8 @@ var (
 )
 
 func init() {
-	flag.StringVar(&port, "port", ":8000", "The port to listen on, 8000 by default")
-	flag.StringVar(&port, "p", ":8000", "Shortform for port")
+	flag.StringVar(&port, "port", "8000", "The port to listen on, 8000 by default")
+	flag.StringVar(&port, "p", "8000", "Shortform for port")
 	flag.StringVar(&dir, "dir", ".", "Directory to serve files from, current directory by default")
 	flag.StringVar(&dir, "d", ".", "Shortform for dir")
 }
@@ -26,8 +27,8 @@ func init() {
 func main() {
 	flag.Parse()
 
-	http.Handle("/", http.FileServer(http.Dir(dir)))
-	log.Printf("Listening on 127.0.0.1%s\n", port)
+	addr := fmt.Sprintf(":%s", port)
+	log.Printf("Listening on localhost%s\n", addr)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, os.Kill)
@@ -40,7 +41,9 @@ func main() {
 		}
 	}()
 
-	err = http.ListenAndServe(port, nil)
+	http.Handle("/", http.FileServer(http.Dir(dir)))
+
+	err = http.ListenAndServe(addr, nil)
 	if err != nil {
 		log.Fatalf("Oh no %v\n", err)
 	}
