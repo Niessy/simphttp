@@ -1,11 +1,9 @@
 // Simple static file hosting.
-// Similar to python's SimpleHTTPServer
 
 package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -13,22 +11,23 @@ import (
 )
 
 var (
-	port = flag.String("port", "1234", "The port you want to run from localhost")
+	port string
+	dir  string
 	err  error
 )
+
+func init() {
+	flag.StringVar(&port, "port", ":8000", "The port to listen on, 8000 by default")
+	flag.StringVar(&port, "p", ":8000", "Shortform for port")
+	flag.StringVar(&dir, "dir", ".", "Directory to serve files from, current directory by default")
+	flag.StringVar(&dir, "d", ".", "Shortform for dir")
+}
 
 func main() {
 	flag.Parse()
 
-	dir, err := os.Getwd()
-	if err != nil {
-		log.Fatalf("Oh no %v\n", err)
-	}
-
-	addr := fmt.Sprintf("localhost:%s", *port)
-	log.Printf("Current directory is %v\n", dir)
 	http.Handle("/", http.FileServer(http.Dir(dir)))
-	log.Printf("Running on port %s\n", addr)
+	log.Printf("Listening on 127.0.0.1%s\n", port)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, os.Kill)
@@ -41,7 +40,7 @@ func main() {
 		}
 	}()
 
-	err = http.ListenAndServe(addr, nil)
+	err = http.ListenAndServe(port, nil)
 	if err != nil {
 		log.Fatalf("Oh no %v\n", err)
 	}
