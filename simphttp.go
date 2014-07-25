@@ -1,5 +1,5 @@
 // Simple static file hosting.
-
+//
 package main
 
 import (
@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+
+	"github.com/pkg/browser"
 )
 
 var (
@@ -27,8 +29,7 @@ func init() {
 func main() {
 	flag.Parse()
 
-	addr := fmt.Sprintf(":%s", port)
-	log.Printf("Listening on localhost%s\n", addr)
+	addr := fmt.Sprintf("localhost:%s", port)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, os.Kill)
@@ -43,9 +44,13 @@ func main() {
 
 	http.Handle("/", http.FileServer(http.Dir(dir)))
 
+	log.Printf("Listening on %s\n", addr)
+	browser.OpenURL(fmt.Sprintf("http://%s", addr))
+
 	err = http.ListenAndServe(addr, nil)
 	if err != nil {
 		log.Fatalf("Oh no %v\n", err)
+		os.Exit(1)
 	}
 
 }
