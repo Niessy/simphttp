@@ -17,6 +17,7 @@ var (
 	port string
 	dir  string
 	err  error
+	help bool
 )
 
 func init() {
@@ -24,10 +25,18 @@ func init() {
 	flag.StringVar(&port, "p", "8000", "Shortform for port")
 	flag.StringVar(&dir, "dir", ".", "Directory to serve files from, current directory by default")
 	flag.StringVar(&dir, "d", ".", "Shortform for dir")
+	flag.BoolVar(&help, "h", false, "Prints usage info.")
+	flag.BoolVar(&help, "help", false, "Shortform for usage")
 }
 
 func main() {
 	flag.Parse()
+
+	// Print help info
+	if help {
+		flag.Usage()
+		os.Exit(0)
+	}
 
 	addr := fmt.Sprintf("localhost:%s", port)
 
